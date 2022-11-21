@@ -1,0 +1,46 @@
+sudo snap install go --classic
+go version
+
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+sudo apt install protobuf-compiler
+sudo apt install golang-goprotobuf-dev
+
+
+
+
+export PATH="$PATH:$(go env GOPATH)/bin"
+
+protoc --version
+
+Update the gRPC service
+
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+  // Sends another greeting
+  rpc SayHelloAgain (HelloRequest) returns (HelloReply) {}
+}
+
+
+
+Update the server
+
+Open greeter_server/main.go and add the following function to it:
+
+func (s *server) SayHelloAgain(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+        return &pb.HelloReply{Message: "Hello again " + in.GetName()}, nil
+}
+
+Update the client
+
+Open greeter_client/main.go to add the following code to the end of the main() function body:
+
+r, err = c.SayHelloAgain(ctx, &pb.HelloRequest{Name: *name})
+if err != nil {
+        log.Fatalf("could not greet: %v", err)
+}
+log.Printf("Greeting: %s", r.GetMessage())
